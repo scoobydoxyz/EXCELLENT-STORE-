@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Status Pesanan{% endblock %}
+{% block content %}
+<div class="paybox mt">
+  <p>🧾 <code>{{ order.invoice_no }}</code></p>
+  <p>Status: <b>{{ order.state }}</b></p>
+  <a class="btn mt" href="{{ url_for('index') }}">⬅️ Kembali</a>
+</div>
+{% endblock %}

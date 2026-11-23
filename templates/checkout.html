@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">💳 Checkout</h2>
+<div class="rows">
+  {% for it in items %}
+  <div class="row"><div class="nm"><b>{{ it.product.name }}</b><span>{{ it.product.price|rupiah }} × {{ it.qty }}</span></div>
+  <b style="color:var(--gold-lt)">{{ it.subtotal|rupiah }}</b></div>
+  {% endfor %}
+</div>
+<div class="totalbar"><span>Total Bayar</span><span>{{ total|rupiah }}</span></div>
+{% if error %}<div class="alert">{{ error }}</div>{% endif %}
+{% if methods %}
+<form method="post">
+  <p style="margin:8px 0;color:var(--muted);font-size:13px">Pilih metode pembayaran:</p>
+  <div class="methods" id="methods">
+    {% for m in methods %}
+    <label class="method" data-m="{{ m.code }}">
+      <input type="radio" name="method" value="{{ m.code }}" {% if loop.first %}checked{% endif %}>
+      <span class="ic">{{ m.icon }}</span>
+      <span><b>{{ m.nama }}</b><br><small style="color:var(--muted)">{{ m.desc }}</small></span>
+    </label>
+    {% endfor %}
+  </div>
+  <button class="btn block" type="submit">Buat Pesanan ➡️</button>
+</form>
+{% else %}
+<div class="alert">⚠️ Metode pembayaran belum dikonfigurasi. Hubungi admin.</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('.method').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.method').forEach(x => x.classList.remove('sel'));
+    el.classList.add('sel');
+  });
+});
+document.querySelector('.method')?.classList.add('sel');
+</script>
+{% endblock %}

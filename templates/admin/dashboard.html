@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">⚙️ Dashboard <a href="{{ url_for('admin_logout') }}" style="font-size:13px">keluar</a></h2>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+  <a class="btn ghost" href="{{ url_for('admin_dash') }}">Dashboard</a>
+  <a class="btn ghost" href="{{ url_for('admin_produk') }}">Produk</a>
+  <a class="btn ghost" href="{{ url_for('admin_order') }}">Order</a>
+</div>
+<div class="statgrid">
+  <div class="stat"><b>{{ stats.produk }}</b><span>Produk</span></div>
+  <div class="stat"><b>{{ stats.stok }}</b><span>Stok tersedia</span></div>
+  <div class="stat"><b>{{ stats.order_open }}</b><span>Menunggu bayar</span></div>
+  <div class="stat"><b>{{ stats.order_done }}</b><span>Selesai</span></div>
+</div>
+<h3>Order terbaru</h3>
+<table class="tbl">
+  <tr><th>Invoice</th><th>Total</th><th>Status</th></tr>
+  {% for o in recent %}
+  <tr><td><code>{{ o.invoice_no }}</code></td><td>{{ o.total|rupiah }}</td><td>{{ o.state }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

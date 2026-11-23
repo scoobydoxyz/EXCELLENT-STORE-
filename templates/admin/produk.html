@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Admin Produk{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">📦 Produk <a href="{{ url_for('admin_dash') }}" style="font-size:13px">⬅️ dashboard</a></h2>
+<table class="tbl">
+  <tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Aktif</th><th></th></tr>
+  {% for p in products %}
+  <tr>
+    <td><b>{{ p.name }}</b><br><small style="color:var(--muted)">{{ p.code or '-' }} • {{ p.sku }}</small></td>
+    <td>{{ p.price|rupiah }}</td>
+    <td>{{ stok[p.id] }}</td>
+    <td>{{ '✅' if p.active else '❌' }}</td>
+    <td>
+      <form method="post" action="{{ url_for('admin_toggle', pid=p.id) }}" style="display:inline">
+        <button class="iconbtn" title="Aktif/nonaktif">🔀</button>
+      </form>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <form method="post" action="{{ url_for('admin_stok', pid=p.id) }}" style="display:flex;gap:6px">
+        <input name="payload" placeholder="Tambah stok: link / akun / kode..." style="flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px">
+        <button class="btn" type="submit">+ Stok</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

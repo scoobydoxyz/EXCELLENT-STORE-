@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Katalog{% endblock %}
+{% block content %}
+<div class="hero">
+  <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Excellent Store">
+  <h1>EXCELLENT STORE</h1>
+  <p>Produk digital original — murah, aman, terpercaya. Pengiriman otomatis.</p>
+  <div class="usp">
+    <div><b>✅</b>Produk Original</div>
+    <div><b>⚡</b>Proses Cepat</div>
+    <div><b>💬</b>Support Ramah</div>
+    <div><b>🎁</b>Pilihan Lengkap</div>
+  </div>
+</div>
+
+<form class="tools" method="get" action="{{ url_for('index') }}">
+  <input name="q" placeholder="🔍 Cari produk digital..." value="{{ q or '' }}">
+  <button class="btn" type="submit">Cari</button>
+</form>
+<div class="chips">
+  <a class="chip {% if not cat %}on{% endif %}" href="{{ url_for('index', q=q) }}">Semua</a>
+  {% for c in cats %}
+  <a class="chip {% if cat==c.slug %}on{% endif %}" href="{{ url_for('index', q=q, cat=c.slug) }}">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="grid">
+  {% for p in products %}
+  <div class="card">
+    <div class="thumb">{{ p.name[0] }}</div>
+    <div class="body">
+      <h3>{{ p.name }}</h3>
+      <div class="price">{{ p.price|rupiah }}</div>
+      <div class="stok {% if stok[p.id]==0 %}habis{% endif %}">
+        {% if stok[p.id]>0 %}Stok: {{ stok[p.id] }}{% else %}Stok habis{% endif %}
+      </div>
+      <div style="flex:1"></div>
+      <a class="btn block" href="{{ url_for('produk', pid=p.id) }}">Lihat</a>
+    </div>
+  </div>
+  {% else %}
+  <p style="color:var(--muted)">Tidak ada produk ditemukan.</p>
+  {% endfor %}
+</div>
+
+<section class="blk">
+  <h2>💳 Metode Pembayaran</h2>
+  <p class="sub">Pilih yang paling nyaman untukmu</p>
+  <div class="payicons">
+    <span>🔍 QRIS</span><span>💵 DANA</span><span>👛 GoPay</span>
+    <span>🛍️ ShopeePay</span><span>🏦 Bank</span><span>🟡 Binance Pay</span>
+  </div>
+</section>
+
+<section class="blk">
+  <h2>⭐ Testimoni</h2>
+  <p class="sub">Kata mereka yang sudah order</p>
+  <div class="testi">
+    <div class="t"><div class="stars">★★★★★</div><p>"Order Netflix 5 menit langsung masuk. Recommended!"</p><small>— Rian, Jakarta</small></div>
+    <div class="t"><div class="stars">★★★★★</div><p>"CapCut Pro murah banget, pembayaran QRIS gampang."</p><small>— Sinta, Surabaya</small></div>
+    <div class="t"><div class="stars">★★★★★</div><p>"CS fast respon, Spotify langsung aktif. Mantap."</p><small>— Dimas, Bandung</small></div>
+  </div>
+</section>
+
+<section class="blk">
+  <h2>❓ FAQ</h2>
+  <details class="faq"><summary>Bagaimana cara beli?</summary><p>Pilih produk → masukkan keranjang → checkout → pilih metode bayar → bayar sesuai nominal → produk otomatis tampil di halaman sukses.</p></details>
+  <details class="faq"><summary>Berapa lama produk dikirim?</summary><p>Otomatis, biasanya dalam hitungan detik setelah pembayaran terdeteksi.</p></details>
+  <details class="faq"><summary>Metode pembayaran apa saja?</summary><p>QRIS, DANA/GoPay/ShopeePay, transfer bank, dan Binance Pay (USDT).</p></details>
+  <details class="faq"><summary>Apakah ada garansi?</summary><p>Ya, garansi sesuai deskripsi tiap produk. Hubungi admin bila ada kendala.</p></details>
+</section>
+{% endblock %}

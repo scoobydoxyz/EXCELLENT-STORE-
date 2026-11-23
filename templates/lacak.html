@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Lacak Pesanan{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">🔍 Lacak Pesanan</h2>
+<form method="post">
+  <div class="field">
+    <label>Nomor invoice (contoh: INV-EXC-20261013-CC0001)</label>
+    <input name="invoice" placeholder="INV-EXC-..." required>
+  </div>
+  <button class="btn block" type="submit">Lacak</button>
+</form>
+{% if error %}<div class="alert mt">{{ error }}</div>{% endif %}
+{% if order %}
+<div class="paybox">
+  <p>🧾 <code>{{ order.invoice_no }}</code></p>
+  <p>Total: <b style="color:var(--gold-lt)">{{ order.total|rupiah }}</b></p>
+  <p>Status:
+    {% if order.state == 'WAITING_PAYMENT' %}<span class="pill wait">MENUNGGU PEMBAYARAN</span>
+    {% elif order.state in ['PAID','COMPLETED'] %}<span class="pill done">LUNAS</span>
+    {% elif order.state == 'EXPIRED' %}<span class="pill exp">KEDALUWARSA</span>
+    {% else %}<span class="pill wait">{{ order.state }}</span>{% endif %}
+  </p>
+  {% if order.state == 'WAITING_PAYMENT' %}
+  <a class="btn block mt" href="{{ url_for('bayar', invoice=order.invoice_no) }}">Lanjut Bayar ➡️</a>
+  {% elif order.state in ['PAID','COMPLETED'] %}
+  <a class="btn block mt" href="{{ url_for('sukses', invoice=order.invoice_no) }}">Lihat Produk 📦</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

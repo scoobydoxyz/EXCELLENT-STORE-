@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<div style="max-width:380px;margin:40px auto">
+  <h2 class="center">🔐 Admin</h2>
+  {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+  <form method="post">
+    <div class="field"><label>Password</label><input type="password" name="password" required></div>
+    <button class="btn block" type="submit">Masuk</button>
+  </form>
+</div>
+{% endblock %}

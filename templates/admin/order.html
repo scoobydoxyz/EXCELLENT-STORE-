@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Admin Order{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">🧾 Order <a href="{{ url_for('admin_dash') }}" style="font-size:13px">⬅️ dashboard</a></h2>
+<table class="tbl">
+  <tr><th>Invoice</th><th>Total</th><th>Metode</th><th>Status</th></tr>
+  {% for o in orders %}
+  <tr>
+    <td><code style="font-size:11px">{{ o.invoice_no }}</code></td>
+    <td>{{ o.total|rupiah }}</td>
+    <td>{{ o.pay_method }}</td>
+    <td>
+      {% if o.state == 'WAITING_PAYMENT' %}<span class="pill wait">MENUNGGU</span>
+      {% elif o.state in ['PAID','COMPLETED'] %}<span class="pill done">LUNAS</span>
+      {% elif o.state == 'EXPIRED' %}<span class="pill exp">EXPIRED</span>
+      {% else %}{{ o.state }}{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

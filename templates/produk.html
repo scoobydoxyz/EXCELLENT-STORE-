@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<div style="margin:14px 0"><a href="{{ url_for('index') }}">⬅️ Kembali</a></div>
+<div class="detail">
+  <div class="thumb">{{ p.name[0] }}</div>
+  <div class="buybox">
+    <h2>{{ p.name }}</h2>
+    {% if p.category %}<p style="color:var(--muted);font-size:13px">{{ p.category.name }}</p>{% endif %}
+    <div class="price">{{ p.price|rupiah }}</div>
+    <p style="font-size:13px;color:var(--muted)">
+      {% if stok>0 %}Stok tersedia: <b style="color:var(--green)">{{ stok }}</b>
+      {% else %}<b style="color:var(--red)">Stok habis</b>{% endif %}
+    </p>
+    {% if p.description %}<p style="margin:10px 0">{{ p.description }}</p>{% endif %}
+    <form id="addform">
+      <div class="qty">
+        <button type="button" onclick="chg(-1)">−</button>
+        <b id="qv">1</b>
+        <button type="button" onclick="chg(1)">+</button>
+      </div>
+      <button class="btn block" type="submit" {% if stok==0 %}disabled{% endif %}>🛒 Tambah ke Keranjang</button>
+    </form>
+    <div id="msg" class="alert" style="display:none"></div>
+    <a class="btn ghost block mt" href="{{ url_for('keranjang') }}">Lihat Keranjang</a>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let qv = 1, stok = {{ stok }};
+function chg(d){ qv = Math.max(1, Math.min(stok||1, qv+d)); document.getElementById('qv').textContent = qv; }
+document.getElementById('addform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(); fd.append('pid', {{ p.id }}); fd.append('qty', qv);
+  const r = await fetch("{{ url_for('k_tambah') }}", {method:'POST', body:fd});
+  const j = await r.json();
+  const m = document.getElementById('msg'); m.style.display='block';
+  m.textContent = j.ok ? '✅ Ditambahkan ke keranjang!' : ('❌ ' + (j.error||'gagal'));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Pembayaran {{ order.invoice_no }}{% endblock %}
+{% block content %}
+<h2 style="margin:16px 0">⭐ Pembayaran</h2>
+<p>🧾 Invoice: <code>{{ order.invoice_no }}</code></p>
+<div class="paybox">
+  <div>Total Bayar</div>
+  <div class="amount">{{ inv.unique_amount|rupiah }}</div>
+  <div class="countdown">⏳ Berlaku <span id="cd"></span></div>
+
+  {% if method == 'qris' %}
+    <p style="margin-top:8px">🔍 Scan QR di bawah (nominal sudah terkunci)</p>
+    <div id="qr"></div>
+    <p class="countdown">Bisa pakai DANA, GoPay, ShopeePay, m-banking apa pun</p>
+  {% elif method == 'transfer' %}
+    <p style="margin:8px 0">💳 Transfer <b>PERSIS</b> sesuai nominal ke salah satu:</p>
+    {% for a in accounts %}
+    <div class="acct"><b>{{ a.nama }}</b><code>{{ a.nomor }}</code><small>({{ a.pemilik }})</small></div>
+    {% endfor %}
+  {% elif method == 'binance' %}
+    <p style="margin:8px 0">🟡 Kirim <b>USDT</b> ke wallet berikut:</p>
+    <div class="acct"><b>Jumlah: {{ usdt }} USDT</b><code style="word-break:break-all">{{ wallet }}</code><small>Network: {{ network }} • Rate: 1 USDT = {{ rate|rupiah }}</small></div>
+  {% endif %}
+
+  <p class="mt"><span class="spin"></span> <span id="stxt">Menunggu pembayaran...</span></p>
+  {% if demo %}
+  <form id="demoform" class="mt">
+    <button class="btn ghost block" type="submit">🧪 Simulasikan Pembayaran (demo)</button>
+  </form>
+  {% endif %}
+</div>
+<p class="center" style="color:var(--muted);font-size:12px">Jangan tutup halaman ini. Produk otomatis tampil setelah pembayaran terdeteksi.</p>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+{% if method == 'qris' %}
+new QRCode(document.getElementById('qr'), { text: {{ qris_str|tojson }}, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+{% endif %}
+// countdown
+const expMin = {{ exp_min }};
+const endAt = Date.now() + expMin * 60 * 1000;
+function tick(){
+  const s = Math.max(0, Math.floor((endAt - Date.now())/1000));
+  document.getElementById('cd').textContent =
+    String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
+setInterval(tick, 1000); tick();
+// polling status tiap 5 detik
+async function poll(){
+  try {
+    const r = await fetch("{{ url_for('api_status', invoice=order.invoice_no) }}");
+    const j = await r.json();
+    if (j.ok && (j.state === 'PAID' || j.state === 'COMPLETED')) {
+      location.href = "{{ url_for('sukses', invoice=order.invoice_no) }}";
+      return;
+    }
+    if (j.ok && j.state === 'EXPIRED') {
+      document.getElementById('stxt').textContent = '❌ Pesanan kedaluwarsa. Silakan buat order baru.';
+      return;
+    }
+  } catch(e) {}
+  setTimeout(poll, 5000);
+}
+poll();
+{% if demo %}
+document.getElementById('demoform').addEventListener('submit', async e => {
+  e.preventDefault();
+  await fetch("{{ url_for('demo_bayar', invoice=order.invoice_no) }}", {method:'POST'});
+  poll();
+});
+{% endif %}
+</script>
+{% endblock %}

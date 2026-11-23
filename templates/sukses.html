@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Pesanan Diterima{% endblock %}
+{% block content %}
+<div class="ok-big">🎉</div>
+<h2 class="center">Pembayaran Berhasil!</h2>
+<p class="center" style="color:var(--muted)">Invoice <code>{{ order.invoice_no }}</code></p>
+<p class="mt">Ini produk digitalmu — simpan baik-baik:</p>
+{% for d in delivered %}
+<div class="deliv">
+  <b>📦 {{ d.nama }}</b>
+  <code>{{ d.payload }}</code>
+</div>
+{% else %}
+<p class="alert">Produk sedang disiapkan. Hubungi admin bila tidak muncul.</p>
+{% endfor %}
+<div class="center mt">
+  <a class="btn" href="{{ url_for('index') }}">🛍️ Belanja Lagi</a>
+</div>
+{% endblock %}
